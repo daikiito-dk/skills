@@ -1,0 +1,33 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  repository-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files
+        run: |
+          test -f README.md
+          test -f CONTRIBUTING.md
+          test -f skills/github-development-health-check/SKILL.md
+
+      - name: Check Markdown files are non-empty
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(README.md CONTRIBUTING.md skills/github-development-health-check/SKILL.md .github/pull_request_template.md)
+          for file in "${files[@]}"; do
+            test -s "$file"
+          done
+
+      - name: Check Skill has required sections
+        run: |
+          grep -q "# GitHub Development Health Check" skills/github-development-health-check/SKILL.md
+          grep -q "## Purpose" skills/github-development-health-check/SKILL.md
+          grep -q "## Standard Output" skills/github-development-health-check/SKILL.md
